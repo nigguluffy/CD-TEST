@@ -27,7 +27,7 @@ jobs:
         
       - name: Clone The Repository
         run: |
-          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.REPOSLUG }} CD
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} CD
           cd CD
         timeout-minutes: 5
         continue-on-error: false
@@ -71,7 +71,7 @@ jobs:
 
       - name: Create an empty commit
         run: |
-          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.REPOSLUG }} temp
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} temp
           cd temp
-          git commit --allow-empty -m "[LOOP] Re-run XenonCI workflow"
+          git commit --allow-empty -m "[LOOP] Re-run CD for Testing bots"
           git push
