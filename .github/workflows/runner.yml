@@ -47,13 +47,6 @@ jobs:
           pip install -r requirements.txt
         timeout-minutes: 10
         continue-on-error: false
-
-      - name: Run dependency setup utility
-        run: |
-          cd CD
-          python utils/setup_dependencies.py
-        timeout-minutes: 5
-        continue-on-error: false
          
       - name: Run the bot
         run: |
