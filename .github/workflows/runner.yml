@@ -12,6 +12,8 @@ on:
 env:
   mail: "github-actions@github.com"
   username: "github-actions[bot]"
+  ACTIONS_RUNNER_DEBUG: true
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
   run-bot:
