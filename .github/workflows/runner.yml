@@ -48,22 +48,6 @@ jobs:
           cd CD
           python -m pip install --upgrade pip
           sudo apt-get install poppler-utils
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo apt update
-          sudo apt install google-chrome-stable
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg ca-certificates
-          # Install Google Chrome stable (works well with Selenium Manager)
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-linux-signing-keyring.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          echo "CHROMIUM_BIN=/usr/bin/google-chrome" >> $GITHUB_ENV
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser
           apt-get update \
           apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 poppler-utils \
           
