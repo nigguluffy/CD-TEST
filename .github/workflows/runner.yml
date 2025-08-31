@@ -64,6 +64,9 @@ jobs:
           echo "CHROMIUM_BIN=/usr/bin/google-chrome" >> $GITHUB_ENV
           sudo apt-get update
           sudo apt-get install -y chromium-browser
+          apt-get update \
+          apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 poppler-utils \
+          pip3 install --no-cache-dir -r requirements.txt
           
           pip install -r requirements.txt
         timeout-minutes: 10
