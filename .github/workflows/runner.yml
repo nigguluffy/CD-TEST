@@ -19,44 +19,51 @@ jobs:
   run-bot:
     name: CD for Testing bots
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 hours timeout for the entire job
+    timeout-minutes: 40  # total job timeout (just in case)
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         timeout-minutes: 3
-        continue-on-error: false
         
       - name: Clone The Repository
         run: |
           git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} CD
           cd CD
         timeout-minutes: 5
-        continue-on-error: false
         
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'   # match your Dockerfile
         timeout-minutes: 5
-        continue-on-error: false
           
-      - name: Install Python dependencies, Chromium & Poppler-utils
+      - name: Install system dependencies & Python requirements
         run: |
           sudo apt-get update
-          sudo apt-get install -y --fix-missing poppler-data libpoppler-dev poppler-utils
-          cd CD
-          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 \
+          sudo apt-get install -y --no-install-recommends \
+            libreoffice-writer \
+            ure \
+            libreoffice-java-common \
+            fonts-dejavu \
+            fonts-noto-core \
+            poppler-utils \
+            libpango-1.0-0 \
+            libpangoft2-1.0-0
           
-          pip install -r requirements.txt
-        timeout-minutes: 10
-        continue-on-error: false
+          # Optional cleanup like in Dockerfile
+          sudo apt-get purge -y libreoffice-help-* libreoffice-l10n-* libreoffice-dict-* || true
+          sudo rm -rf /var/lib/apt/lists/*
+          
+          cd CD
+          pip install --no-cache-dir -r requirements.txt
+        timeout-minutes: 15
          
-      - name: Run the bot
+      - name: Run the bot (30 min test)
         run: |
           cd CD 
           python main.py
-        timeout-minutes: 340  # Almost 6 hours for the bot itself
+        timeout-minutes: 30   # ⬅️ only run for 30 minutes to test
         continue-on-error: true
 
   looper:
@@ -77,4 +84,4 @@ jobs:
           git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} temp
           cd temp
           git commit --allow-empty -m "[LOOP] Re-run CD for Testing bots"
-          git push 
+          git push
