@@ -1,10 +1,7 @@
 name: CD for Testing bots
 
 on:
-  # Manual trigger using GitHub Actions UI
   workflow_dispatch:
-  
-  # Automatically trigger on push to main branch
   push:
     branches:
       - main
@@ -19,25 +16,22 @@ jobs:
   run-bot:
     name: CD for Testing bots
     runs-on: ubuntu-latest
-    timeout-minutes: 40  # total job timeout (just in case)
+    timeout-minutes: 20  # 6 hours total job timeout
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        timeout-minutes: 3
         
       - name: Clone The Repository
         run: |
           git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} CD
           cd CD
-        timeout-minutes: 5
         
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'   # match your Dockerfile
-        timeout-minutes: 5
-          
+          python-version: '3.11'   # match Dockerfile
+        
       - name: Install system dependencies & Python requirements
         run: |
           sudo apt-get update
@@ -50,25 +44,23 @@ jobs:
             poppler-utils \
             libpango-1.0-0 \
             libpangoft2-1.0-0
-          
-          # Optional cleanup like in Dockerfile
           sudo apt-get purge -y libreoffice-help-* libreoffice-l10n-* libreoffice-dict-* || true
           sudo rm -rf /var/lib/apt/lists/*
-          
           cd CD
           pip install --no-cache-dir -r requirements.txt
-        timeout-minutes: 15
+        timeout-minutes: 20
          
-      - name: Run the bot (30 min test)
+      - name: Run the bot
         run: |
-          cd CD 
+          cd CD
           python main.py
-        timeout-minutes: 30   # ⬅️ only run for 30 minutes to test
-        continue-on-error: true
+        timeout-minutes: 10   # ~5 hours 40 mins for bot
+        continue-on-error: true   # important so the next job runs even if bot fails or times out
 
   looper:
     name: CD for Testing bots & keep it running
     needs: run-bot
+    if: always()   # run even if run-bot failed or timed out
     runs-on: ubuntu-latest
     steps:
       - name: Set Git Configs & Secrets
@@ -77,7 +69,8 @@ jobs:
           git config --global user.name "${{ env.username }}"
           git config --global pull.rebase false
           git config --global credential.helper store
-          echo "https://${{ env.username }}:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
+          # Use GH_TOKEN here if pushing to another repo
+          echo "https://${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
 
       - name: Create an empty commit
         run: |
