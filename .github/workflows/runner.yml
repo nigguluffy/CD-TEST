@@ -19,7 +19,7 @@ jobs:
   run-bot:
     name: CD for Testing bots
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 hours timeout for the entire job
+    timeout-minutes: 8  # 6 hours timeout for the entire job
     
     steps:
       - name: Checkout code
@@ -67,7 +67,7 @@ jobs:
         run: |
           cd CD 
           python main.py
-        timeout-minutes: 340  # Almost 6 hours for the bot itself
+        timeout-minutes: 5  # Almost 6 hours for the bot itself
         continue-on-error: true
 
   looper:
@@ -85,7 +85,7 @@ jobs:
 
       - name: Create an empty commit
         run: |
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/${{ secrets.REPOSLUG }} temp
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY} temp
           cd temp
           git commit --allow-empty -m "[LOOP] Re-run CD for Testing bots"
           git push
